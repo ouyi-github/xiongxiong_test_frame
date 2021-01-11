@@ -20,3 +20,7 @@ case_log = MyLogger(name='caselog',path=logger_path,level=logger_level,format=lo
 # allure报告路径配置
 result_path = os.path.join(BASE_DIR,f'report/allure_result/{get_now_time()}')
 report_path = os.path.join(BASE_DIR,f'report/allure_report/{get_now_time()}')
+
+# element_yaml中所有的action配置
+element_yaml_actions = ['_find_element','_find_elments','_find_element_and_click','_find_element_and_sendkeys','_wait_element_to_click',
+                        '_swip_find_element','_broswer_quit','_get_toast','_swip_find_element_and_click']

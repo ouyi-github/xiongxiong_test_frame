@@ -33,8 +33,8 @@ def get_data_from_yaml(path):
 
 
 if __name__ == "__main__":
-    print(get_data_from_ini(node='main', key='goto_address'))
-    # from app_frame.my_configs import config
-    # s = get_data_from_yaml(os.path.join(config.BASE_DIR,'data/case_data/add_remenber.yaml'))
-    # print(s)
+    # print(get_data_from_ini(node='main', key='goto_address'))
+    from app_frame.my_configs import config
+    s = get_data_from_yaml(path=os.path.join(config.BASE_DIR,'data/test_markpage_search.yaml'))
+    print(s)
 

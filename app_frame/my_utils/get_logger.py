@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
-
 class MyLogger:
     """
     自定义logging类
@@ -31,6 +29,9 @@ class MyLogger:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    logging.info('666')
+    from app_frame.my_configs import config
+    # 生成一个logger实例
+    case_log = MyLogger(name='caselog', path=config.logger_path, level=config.logger_level, format=config.logger_format).get_logger()
+    case_log.info('success')
+    case_log.error('failed')
 

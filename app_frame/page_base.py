@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 # author : ouyi
 # create_time: 2021-01-09
+import os
 
+import allure
 from appium import webdriver
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-
+from app_frame.my_utils.get_data import get_data_from_yaml
 from app_frame.common_decorator import black_list_find, black_list_wait
 from app_frame.my_configs import config
 
@@ -27,7 +29,7 @@ class BasePage:
             caps['unicodeKeyboard'] = 'true'  # 设置中文输入
             caps['resetKeyboard'] = 'true'  # 设置中文输入
             self._driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub',caps)
-            self._driver.implicitly_wait(10)
+            self._driver.implicitly_wait(3)
         else:
             self._driver = driver
 
@@ -84,6 +86,9 @@ class BasePage:
             ele = self._driver.find_element(MobileBy.ACCESSIBILITY_ID,message)
             config.case_log.info(f'find element {element} success (method={method},message={message})')
             return ele
+
+
+
 
 
 
@@ -156,6 +161,10 @@ class BasePage:
             raise e
 
 
+
+
+
+
     def _find_element_and_sendkeys(self,method,message,element,text):
         """
         封装查找元素并输入内容的方法，添加日志功能
@@ -207,14 +216,28 @@ class BasePage:
             WebDriverWait(self._driver,timeout=10).until(expected_conditions.element_to_be_clickable((MobileBy.ACCESSIBILITY_ID,message)))
 
 
-    def _swip_find_element(self,method,message):
+
+
+
+
+    def _swip_find_element(self,method,message,element):
         """
         自定义滑动查找元素
         :param method:
         :param message:
         :return:
         """
+        self._driver.implicitly_wait(2)
         while True:
+            ss = False
+            try:
+                element = self._find_element(method=method, message=message,element=element)
+                ss = True
+                config.case_log.info(f'swip_find_element element {element} success (method={method},message={message})')
+            except:
+                pass
+            if ss:
+                break
             w_size = self._driver.get_window_size()
             w_x = w_size['width']
             w_y = w_size['height']
@@ -222,30 +245,29 @@ class BasePage:
             y1 = int(w_y) * 0.8
             y2 = int(w_y) * 0.2
             action = TouchAction(self._driver)
-            action.press(x=int(x),y=int(y1))
-            action.move_to(x=int(x),y=int(y2))
+            action.press(x=int(x), y=int(y1))
+            action.move_to(x=int(x), y=int(y2))
             action.release()
             action.perform()
-            element = self._find_element(method=method,message=message)
-            if element:
-                break
-        return element
+        return
 
 
-    def _swip_find_element_and_click(self,method,message):
+
+    def _swip_find_element_and_click(self,method,message,element):
         """
         自定义滑动查找元素并点击
         :param method:
         :param message:
         :return:
         """
+        self._driver.implicitly_wait(2)
         while True:
             ss = False
             try:
-                element = self._find_element(method=method, message=message)
+                element = self._find_element(method=method, message=message,element=element)
                 element.click()
                 ss = True
-                config.case_log.info(f'click element success (method={method},message={message})')
+                config.case_log.info(f'swip_find_element_and_click element success (method={method},message={message})')
             except:
                 pass
             if ss:
@@ -275,6 +297,52 @@ class BasePage:
         except Exception as e:
             config.case_log.error('获取页面Toast：error')
             raise e
+
+    def _broswer_quit(self):
+        self._driver.quit()
+
+    def _get_screenshot(self,path):
+        """
+        二次封装：截图并上传allure报告的方法
+        :param path:
+        :return:
+        """
+        self._driver.get_screenshot_as_file(filename=path)
+        allure.attach.file(source=path,name='失败截图', attachment_type=allure.attachment_type.PNG)
+
+    def _load_element_yaml_action(self,path,node,*args,**kwargs):
+        """
+        从yaml文件中读取element信息，并遍历执行所有element
+        :param path: yaml文件路径
+        :param node: page页面中具体的函数名
+        :return:
+        """
+        data = get_data_from_yaml(path)
+        for step in data.get(node):
+            if step['action'] == '_find_element':
+                self._find_element(step['method'], step['message'], step['element'])
+            elif step['action'] == '_find_elments':
+                self._find_elments(step['method'], step['message'], step['element'])
+            elif step['action'] == '_find_element_and_click':
+                self._find_elments(step['method'], step['message'], step['element'])
+            elif step['action'] == '_find_element_and_sendkeys':
+                content = kwargs[step['text_key']]
+                self._find_element_and_sendkeys(step['method'], step['message'], step['element'],content)
+            elif step['action'] == '_wait_element_to_click':
+                self._find_element_and_click(step['method'], step['message'], step['element'])
+            elif step['action'] == '_swip_find_element':
+                self._swip_find_element(step['method'], step['message'], step['element'])
+            elif step['action'] == '_swip_find_element_and_click':
+                self._swip_find_element_and_click(step['method'], step['message'], step['element'])
+            elif step['action'] == '_broswer_quit':
+                self._broswer_quit()
+            elif step['action'] == '_get_toast':
+                self._get_toast()
+            else:
+                config.case_log.error(f'yaml文件（{path}.{node}）中元素action: {step["action"]}未找到')
+                raise Exception('yaml中元素信息填写错误')
+
+
 
 
 
