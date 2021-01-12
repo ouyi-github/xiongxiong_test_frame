@@ -5,7 +5,9 @@ xiongxiong_test_frame是一套测试框架，包含web端UI测试框架，app端
 
 ## 项目模块介绍
 
-app_frame：app端测试框架v
+app_frame：app端测试框架
+
+web_frame：web端测试框架
 
 ### 1.app_frame
 
@@ -21,11 +23,17 @@ my_utils：日志，文件读取，时间获取等公共方法
 
 my_configs：项目配置文件
 
-data：页面元素，用例数据等数据文件
+data：用例数据文件
+
+imgs：失败截图
+
+page_element_yaml：页面元素信息文件
 
 logs：存放日志文件
 
 report：存放测试报告
 
-imgs：截图文件
+video：录屏文件
+
+
 
