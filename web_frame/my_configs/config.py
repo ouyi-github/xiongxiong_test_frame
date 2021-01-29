@@ -24,3 +24,6 @@ report_path = os.path.join(BASE_DIR,f'report/allure_report/{get_now_time()}')
 # element_yaml中所有的action配置
 element_yaml_actions = ['_find_element','_find_elments','_find_element_and_click','_find_element_and_sendkeys','_wait_element_to_click',
                         '_swip_find_element','_broswer_quit','_get_toast','_swip_find_element_and_click']
+
+# 浏览器cookie文件地址
+COOKIE_PATH = os.path.join(BASE_DIR,'cookies.yaml')

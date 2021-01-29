@@ -13,7 +13,7 @@ def get_base_dir():
         if now_dir_list[1] == "xiongxiong_test_frame":
             now_dir = os.path.join(now_dir_list[0], now_dir_list[1])
             break
-    return os.path.join(now_dir,'app_frame')
+    return os.path.join(now_dir,'web_frame')
 
 
 
